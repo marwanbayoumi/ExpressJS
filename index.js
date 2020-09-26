@@ -24,25 +24,28 @@ app.listen(PORT, () => console.log(`Server started on ${PORT}`));
 app.get('/', (req, res) => {
 
     if (!req.query.inp) {
-        res.render('index')
+        res.render('index');
     } else {
-        connection.connect();
+        // connection.connect();
         let inp = req.query.inp;
         console.log(`Query input given was: ${inp}`);
         let param = `SELECT * FROM nouns AS solution where spanish="${inp}"`;
-        connection.query(param, function (err, rows, fields) {
-            // if (err || !rows) {
-            //     throw err;
-            //     res.redirect('index');
-            // } else {
-            arr = rows[0].english;
-            console.log(rows[0].english);
-            res.render('index', { arr });
-            connection.end();
 
-            // }
+        connection.query(param, function (err, rows, fields) {
+            if (err) {
+                throw err;
+            } else if (rows.length === 0) {
+                console.log("The given input was not found");
+                res.render('index');
+            }
+            else {
+                arr = rows[0].english;
+                console.log(rows[0].english);
+                res.render('index', { arr });
+            }
         });
     }
+    // connection.end();
 });
 
 // app.use(logger);
